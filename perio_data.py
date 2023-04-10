@@ -16,8 +16,7 @@ from utils import *
 perio_data = Flask(__name__)
 
 
-@perio_data.route(
-    '/perio_data', methods=['POST'], endpoint='fn_perio_data')
+@perio_data.route('/', methods=['POST'], endpoint='fn_perio_data')
 # @validate_jwt
 def fn_perio_data():
     logging.basicConfig(level=logging.INFO,  format='%(asctime)s - %(levelname)s - %(message)s')
@@ -31,7 +30,6 @@ def fn_perio_data():
                     status=500)
     
     request_data = request.get_data()
-
     if request_data:
         if request_data is None:
             return jsonify(
@@ -40,14 +38,13 @@ def fn_perio_data():
                     status=400), 400
         try:
             # PDF part 
-            bytesio = BytesIO(request_data)
-            reader = PdfReader(BytesIO(bytesio))
+            # bytesio = BytesIO(request_data)
+            # reader = PdfReader(BytesIO(bytesio))
 
             # JSON part
-            json_bytes = BytesIO(request_data)
-            myjson = json.load(json_bytes)
-
-            # pipelineContextJson = json.load(bytesio_array)
+            # json_bytes = BytesIO(request_data)
+            myjson = json.loads(request_data)
+            
         except Exception as ex:
             logging.error('PERIO DATA-PRE-PROCESS : perio data extraction :  : Error decoding byte array: ' + str(ex))
             return jsonify(
@@ -214,6 +211,7 @@ def fn_perio_data():
 
             try:                     
                 all_teeth_char_list = final_tooth_char_mapping(tooth_char_mapping_list)
+                print("-------------------------------------------------------------------------------------------")
             except Exception as ex:
                 message = message + "/" + "Failure in final_tooth_char_mapping: " + str(ex)
                 logging.info("PERIO DATA  :", message)
