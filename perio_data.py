@@ -1,19 +1,22 @@
 #!/usr/bin/env python
-from flask import Flask, request, send_file, Blueprint
 import os
 import sys
-
-import requests
-from flask.json import jsonify
 import logging
+import requests
+
+from flask.json import jsonify
+from flask import Flask, request, send_file, Blueprint
 
 import io
 from io import BytesIO
 from PyPDF2 import PdfReader, PdfWriter
 
 from utils import *
+from validate_jwt import validate_jwt
+from contract_pdf_preprocess import contract_pdf_preprocess
 
 perio_data = Flask(__name__)
+perio_data.register_blueprint(contract_pdf_preprocess)
 
 
 @perio_data.route('/', methods=['POST'], endpoint='fn_perio_data')
@@ -42,7 +45,6 @@ def fn_perio_data():
             # reader = PdfReader(BytesIO(bytesio))
 
             # JSON part
-            # json_bytes = BytesIO(request_data)
             myjson = json.loads(request_data)
             
         except Exception as ex:
@@ -217,7 +219,7 @@ def fn_perio_data():
                 logging.info("PERIO DATA  :", message)
                 pass
 
-            return jsonify(all_teeth_char_list, message=message, category="Success", status=200)
+            return jsonify(result = all_teeth_char_list, message=message, category="Success", status=200)
             
         except Exception as ex:
             logging.error("PERIO DATA  : facesheetextraction : Unexpected Error in facesheetextraction3: ' + str(ex)")
